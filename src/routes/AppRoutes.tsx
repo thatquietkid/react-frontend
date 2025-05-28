@@ -7,6 +7,7 @@ import Users from '../pages/Users';
 import Reports from '../pages/Reports';
 import Settings from '../pages/Settings';
 import Login from '../pages/Login';
+import Register from '../pages/Register';
 import { useAuth } from '../context/AuthContext';
 
 const AppRoutes = () => {
@@ -15,6 +16,7 @@ const AppRoutes = () => {
   return (
     <Routes>
       <Route path="/login" element={!isAuthenticated ? <Login /> : <Navigate to="/" />} />
+      <Route path="/register" element={!isAuthenticated ? <Register /> : <Navigate to="/" />} />
       <Route path="/" element={isAuthenticated ? <Dashboard /> : <Navigate to="/login" />} />
       <Route path="/inventory" element={isAuthenticated ? <Inventory /> : <Navigate to="/login" />} />
       <Route path="/resources" element={isAuthenticated ? <ResourceScheduler /> : <Navigate to="/login" />} />

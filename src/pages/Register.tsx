@@ -1,18 +1,28 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { AlertCircle } from 'lucide-react';
+import { AlertCircle, UserPlus } from 'lucide-react';
 import fetchApi from '../lib/api';
-import type { AuthResponse, User } from '../types';
+import type { User } from '../types';
 
-const Login = () => {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
+const Register = () => {
+  const [formData, setFormData] = useState({
+    username: '',
+    full_name: '',
+    password: '',
+    role: 'Student'
+  });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const { login } = useAuth();
   const navigate = useNavigate();
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    setFormData(prev => ({
+      ...prev,
+      [e.target.name]: e.target.value
+    }));
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -20,30 +30,18 @@ const Login = () => {
     setLoading(true);
 
     try {
-      const formData = new URLSearchParams();
-      formData.append('username', username);
-      formData.append('password', password);
-      formData.append('grant_type', 'password');
-      formData.append('scope', '');
-      formData.append('client_id', 'string');
-      formData.append('client_secret', 'string');
-
-      const authResponse = await fetchApi<AuthResponse>('/auth/login', {
+      await fetchApi<User>('/auth/register', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
+          'Content-Type': 'application/json',
         },
-        body: formData,
+        body: JSON.stringify(formData),
       });
 
-      const userResponse = await fetchApi<User>('/auth/me', {
-        token: authResponse.access_token,
-      });
-
-      await login(authResponse.access_token, userResponse);
-      navigate('/');
+      // Redirect to login after successful registration
+      navigate('/login');
     } catch (err: any) {
-      setError(err.message || 'Invalid username or password');
+      setError(err.message || 'Registration failed');
     } finally {
       setLoading(false);
     }
@@ -52,6 +50,7 @@ const Login = () => {
   return (
     <div className="min-h-screen flex items-center justify-center bg-blue-50">
       <div className="relative w-full max-w-6xl bg-white shadow-lg rounded-lg overflow-hidden md:flex">
+        {/* Logo */}
         <div className="absolute top-4 left-4 flex items-center space-x-3 z-20">
           <img
             src="/logo.jpg"
@@ -61,6 +60,7 @@ const Login = () => {
           <h1 className="text-lg font-bold text-gray-800">Manav Rachna Institute</h1>
         </div>
 
+        {/* Left Side: Image */}
         <div className="relative hidden md:flex flex-1 items-center justify-center p-8 rounded-lg overflow-hidden">
           <div className="absolute inset-0 bg-blue-300 rounded-lg"></div>
           <div className="absolute inset-0 bg-white bg-opacity-40 blur-xl rounded-lg"></div>
@@ -71,10 +71,11 @@ const Login = () => {
           />
         </div>
 
+        {/* Right Side: Form */}
         <div className="flex-1 p-8 pt-24 space-y-6 relative">
           <div>
-            <h2 className="text-xl font-bold text-gray-800">Welcome Back!</h2>
-            <p className="mt-2 text-sm text-gray-600">Please sign in to your account</p>
+            <h2 className="text-xl font-bold text-gray-800">Create an Account</h2>
+            <p className="mt-2 text-sm text-gray-600">Join our community and manage resources efficiently</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
@@ -83,10 +84,26 @@ const Login = () => {
                 Username
               </label>
               <input
-                id="username"
                 type="text"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
+                id="username"
+                name="username"
+                value={formData.username}
+                onChange={handleChange}
+                className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                required
+              />
+            </div>
+
+            <div>
+              <label htmlFor="full_name" className="block text-sm font-medium text-gray-700">
+                Full Name
+              </label>
+              <input
+                type="text"
+                id="full_name"
+                name="full_name"
+                value={formData.full_name}
+                onChange={handleChange}
                 className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
                 required
               />
@@ -97,13 +114,32 @@ const Login = () => {
                 Password
               </label>
               <input
-                id="password"
                 type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                id="password"
+                name="password"
+                value={formData.password}
+                onChange={handleChange}
                 className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
                 required
               />
+            </div>
+
+            <div>
+              <label htmlFor="role" className="block text-sm font-medium text-gray-700">
+                Role
+              </label>
+              <select
+                id="role"
+                name="role"
+                value={formData.role}
+                onChange={handleChange}
+                className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                required
+              >
+                <option value="Student">Student</option>
+                <option value="Teacher">Teacher</option>
+                <option value="Admin">Admin</option>
+              </select>
             </div>
 
             {error && (
@@ -113,38 +149,26 @@ const Login = () => {
               </div>
             )}
 
-            <div className="flex items-center justify-between">
-              <div className="flex items-center">
-                <input
-                  id="remember"
-                  type="checkbox"
-                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                />
-                <label htmlFor="remember" className="ml-2 block text-sm text-gray-900">
-                  Keep me logged in
-                </label>
-              </div>
-
-              <div className="text-sm">
-                <a href="/forgot-password" className="font-medium text-blue-600 hover:text-blue-500">
-                  Forgot password?
-                </a>
-              </div>
-            </div>
-
             <button
               type="submit"
               disabled={loading}
               className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
             >
-              {loading ? 'Signing in...' : 'Sign in'}
+              {loading ? (
+                'Creating Account...'
+              ) : (
+                <>
+                  <UserPlus className="h-5 w-5 mr-2" />
+                  Create Account
+                </>
+              )}
             </button>
           </form>
 
           <div className="text-sm text-center text-gray-500">
-            Don't have an account?{' '}
-            <Link to="/register" className="font-medium text-blue-600 hover:text-blue-500">
-              Register here
+            Already have an account?{' '}
+            <Link to="/login" className="font-medium text-blue-600 hover:text-blue-500">
+              Login here
             </Link>
           </div>
         </div>
@@ -153,4 +177,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default Register;
