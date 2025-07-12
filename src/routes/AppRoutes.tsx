@@ -7,7 +7,11 @@ import Users from '../pages/Users';
 import Reports from '../pages/Reports';
 import Settings from '../pages/Settings';
 import Login from '../pages/Login';
+<<<<<<< HEAD
 import Signup from '../pages/Signup';
+=======
+import Register from '../pages/Register';
+>>>>>>> f6289686b729762440b51042e7cc0b34c1ce7fe1
 import { useAuth } from '../context/AuthContext';
 
 const AppRoutes = () => {
@@ -16,7 +20,11 @@ const AppRoutes = () => {
   return (
     <Routes>
       <Route path="/login" element={!isAuthenticated ? <Login /> : <Navigate to="/" />} />
+<<<<<<< HEAD
       <Route path="/signup" element={!isAuthenticated ? <Signup /> : <Navigate to="/" />} />
+=======
+      <Route path="/register" element={!isAuthenticated ? <Register /> : <Navigate to="/" />} />
+>>>>>>> f6289686b729762440b51042e7cc0b34c1ce7fe1
       <Route path="/" element={isAuthenticated ? <Dashboard /> : <Navigate to="/login" />} />
       <Route path="/inventory" element={isAuthenticated ? <Inventory /> : <Navigate to="/login" />} />
       <Route path="/resources" element={isAuthenticated ? <ResourceScheduler /> : <Navigate to="/login" />} />
