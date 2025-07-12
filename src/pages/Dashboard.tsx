@@ -1,4 +1,5 @@
 import React from "react";
+import { useAuth } from '../context/AuthContext';
 import {
   ArrowUpRight,
   ArrowDownRight,
@@ -11,14 +12,22 @@ import {
 const InventoryStatusChart = () => (
   <div className="h-full bg-blue-100 flex items-center justify-center">Chart</div>
 );
+
 const RecentActivity = ({ activities }) => (
   <div>{activities.length} activities</div>
 );
-const LowStockWidget = ({ items }) => <div>{items.length} low stock items</div>;
-const UpcomingReturns = ({ returns }) => <div>{returns.length} upcoming returns</div>;
+
+const LowStockWidget = ({ items }) => (
+  <div>{items.length} low stock items</div>
+);
+
+const UpcomingReturns = ({ returns }) => (
+  <div>{returns.length} upcoming returns</div>
+);
 
 const Dashboard = () => {
-  const user = { name: "Garima" };
+  const { user } = useAuth();
+
   const totalItems = 100;
   const itemsCheckedOut = 40;
   const lowStockItems = [1, 2, 3];
@@ -31,7 +40,7 @@ const Dashboard = () => {
     <div className="space-y-6 bg-[#BBD8EE] min-h-screen p-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
-        <p className="text-sm text-gray-500">Welcome back, {user.name}</p>
+        Welcome back, {user ? user.username : 'Admin'}!
       </div>
 
       {/* Stats overview */}
